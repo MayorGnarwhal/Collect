@@ -1,13 +1,43 @@
-# Collect
+# Introduction
 
 Collect is a module designed to make working with tables in Roblox Luau significantly easier with much cleaner code. 
 Collect supports simple arrays and complex nested dictionaries. 
 
 This project was heavily inspired by Laravel [Collections](https://laravel.com/docs/10.x/collections) and the Laravel [Query Builder](https://laravel.com/docs/10.x/queries), and much of the functionality shares the same names as their Laravel counterparts.
 
-<hr>
+# Creating Collections
+
+# Extending Collections
+You can add your own methods to Collect on runtime. The `macro` method accepts a closure that will be executed when your method is called. An empty Collect object will be passed with the provided closure that can be used to access the Collect methods. For example, you can implement a `toUpper` method on top of the Collect module with the following code:
+```lua
+Collect:macro("toUpper", function(collect)
+	return collect:map(function(value)
+		return string.upper(value)
+	end)
+end)
+
+local collect = Collect.new({"hello", "world"}):toUpper()
+
+print(collect:get())
+-- {"HELLO", "WORLD"}
+```
+
+If necessary, your macro can take additional arguments.
+```lua
+Collect:macro("punctuate", function(collect, puncuation)
+	return collect:map(function(value)
+		return value .. puncuation
+	end)
+end)
+
+local collect = Collect.new({"hello", "world"}):punctuate("!")
+
+print(collect:get())
+-- {"hello!", "world!"}
+```
 
 
+# Available Methods
 ## `filter`
 - `filter(path: string, closure: function)`
 - `filter(closure: function)`
@@ -16,7 +46,7 @@ This project was heavily inspired by Laravel [Collections](https://laravel.com/d
 The `filter` method filters the collection using the given closure, keeping only those items that pass a given truth test.
 ```lua
 local collect = Collect.new(game.Players:GetPlayers()):filter("Character.Humanoid.Health", function(health, value)
-    return health > 0
+	return health > 0
 end)
 
 print(collect:get())
