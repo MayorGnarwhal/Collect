@@ -1,3 +1,10 @@
+# Table of Contents
+* [Introduction](#introduction)
+* [Creating Collections](#creating-collections)
+* [Available Methods](#available-methods)
+* [Technical Details](#technical-details)
+* [Performance](#performance)
+
 # Introduction
 
 Collect is a module designed to make working with tables in Roblox Luau significantly easier with much cleaner code. 
@@ -176,3 +183,41 @@ print(collect:get())
 -- {2, 3, 4, 5}
 ```
 For the inverse of the `whereBetween` method, see the [`whereNotBetween`](#whereNotBetween) method
+
+# Technical Details
+## Collect Object
+A Collect object, before a getter such as `get` is run is a table with the specifications of how the query is built. An example Collect object may look like:
+```lua
+local collect = Collect.new({1, 2, 3, 4}):where(">=", 2):shuffle()
+
+print(collect)
+--[[
+	{
+		Builder = {
+			Actions = {
+				{
+					args = {},
+					func = **function**,
+					name = "shuffle",
+				},
+			},
+			Filters = {
+				{
+					args = {nil, ">=", 2},
+					func = **function**,
+					name = "where",
+				},
+			},
+			Updates = {},
+		},
+		Config = {
+			DebugMode = false,
+			DefaultPath = ".",
+		},
+		Table = {1, 2, 3, 4}
+	}
+--]]
+```
+
+# Performance
+TODO
