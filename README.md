@@ -6,6 +6,38 @@ Collect supports simple arrays and complex nested dictionaries.
 This project was heavily inspired by Laravel [Collections](https://laravel.com/docs/10.x/collections) and the Laravel [Query Builder](https://laravel.com/docs/10.x/queries), and much of the functionality shares the same names as their Laravel counterparts.
 
 # Creating Collections
+A Collect object is, in essense, a wrapper for table manipulation. You can create a Collect object with the `new` function, accepting any table.
+```lua
+local tbl = {1, 2, 3, 4}
+local collect = Collect.new(tbl)
+```
+
+If `new` receives a `tbl` that is a Collect object, it will return a deep copy of the object. This can be useful for running similar queries on the same original `tbl`.
+```lua
+local collect = Collect.new({1, 2, 3, 4, 5}):where(">=", 2)
+local collect2 = Collect.new(collect):shuffle()
+
+print(collect:get())
+-- {2, 3, 4, 5}
+print(collect2:get())
+-- {5, 2, 4, 3}
+```
+
+You can also construct a new table of a given length with the `rep` function. The `rep` method takes two arguments; the `value` of each entry, and the `size` of the table. `value` can be anything, including a closure function.
+```lua
+local collect = Collect.rep(0, 5)
+
+print(collect:get())
+-- {0, 0, 0, 0, 0}
+```
+```lua
+local collect = Collect.rep(function(index)
+	return index
+end, 5)
+
+print(collect:get())
+-- {1, 2, 3, 4, 5}
+```
 
 # Extending Collections
 You can add your own methods to Collect on runtime. The `macro` method accepts a closure that will be executed when your method is called. An empty Collect object will be passed with the provided closure that can be used to access the Collect methods. For example, you can implement a `toUpper` method on top of the Collect module with the following code:
