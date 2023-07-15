@@ -84,8 +84,13 @@ For easily packagable Collect macros, Collect comes with an optional `macros` mo
 For the majority of the remaining Collect documentation, we will look at each method available on the `Collect` module. All of these methods can be chained to fluentry manipulate the underlying table. Most methods will return a new Collect object, allowing preservation of the original collection with necessary.
 
 
-## `filter` <sub>Collect</sub>
+## `filter()`
 Filters the collection using the given closure, keeping only entries that return truthy.
+### Parameters
+| **closure** | *function* | A callback function used to filter the collection |
+| --- | --- | --- |
+
+### Code Samples
 ```lua
 local collect = Collect({1, 2, 3, 4}):filter(function(value, key)
     return value > 2
@@ -94,6 +99,118 @@ end)
 print(collect:get()) --> {3, 4}
 ```
 
+
+## `reject()`
+Filters the collection using the given closure, keeping only entries that do not return truthy.
 ### Parameters
-| **closure** | *function* |
-| --- | --- |
+| **closure** | *function* | A callback function used to filter the collection |
+| --- | --- | --- |
+
+### Code Samples
+```lua
+local collect = Collect({1, 2, 3, 4}):reject(function(value, key)
+    return value > 2
+end)
+
+print(collect:get()) --> {1, 2}
+```
+
+
+## `where()`
+Filters collection using a given equation, keeping only entries that evalaute truthy
+### Parameters
+|     |     |     |
+| --- | --- | --- |
+| **path** | *string?* | Relative path from each entry to the value to be compared <br> **Default Value:** `"."` |
+| **operator** | *string?* | An operator used for the evaluation. Valid operators are: `=`, `==`, `~=`, `!=`, `<>`, `>=`, `<=`, `<`, `>` <br> **Default Value:** `==` |
+| **compare** | *any* | The fixed value compared against each entry |
+
+### Code Samples
+```lua
+local collect = Collect(game.Players:GetPlayers()):where("Character.Humanoid.Health", ">=", 50)
+print(collect:get()) --> {Player1, Player2}
+```
+```lua
+local collect = Collect(game.Players:GetPlayers()):where("UserId", 38162374)
+print(collect:get()) --> {MayorGnarwhal}
+```
+```lua
+local collect = Collect({1, 2, 3, 4, 5}):where(">=", 3)
+print(collect:get()) --> {3, 4, 5}
+```
+```lua
+local collect = Collect(game.Players:GetPlayers()):where(game.Players.MayorGnarwhal)
+print(collect:get()) --> {MayorGnarwhal}
+```
+
+
+## `whereBetween()`
+Filters collections that entries whose numerical values are within [min, max]
+### Parameters
+|     |     |     |
+| --- | --- | --- |
+| **path** | *string?* | Relative path from each entry to the value to be compared <br> **Default Value:** `"."` |
+| **min** | *number* | Minimum value in range |
+| **max** | *number* | Maximum value in range |
+
+### Code Samples
+```lua
+local collect = Collect({1, 2, 3, 4, 5}):whereBetween(2, 4)
+print(collect:get()) --> {2, 3, 4}
+```
+
+
+## `whereNotBetween()`
+Filters collections that entries whose numerical values are not within [min, max]
+### Parameters
+|     |     |     |
+| --- | --- | --- |
+| **path** | *string?* | Relative path from each entry to the value to be compared <br> **Default Value:** `"."` |
+| **min** | *number* | Minimum value in range |
+| **max** | *number* | Maximum value in range |
+
+### Code Samples
+```lua
+local collect = Collect({1, 2, 3, 4, 5}):whereNotBetween(2, 4)
+print(collect:get()) --> {1, 5}
+```
+
+
+## `whereIn()`
+Filters collection to values found in a given array
+### Parameters
+|     |     |     |
+| --- | --- | --- |
+| **path** | *string?* | Relative path from each entry to the value to be compared <br> **Default Value:** `"."` |
+| **haystack** | *table \| Collect* | Array in which to search |
+
+### Code Samples
+```lua
+local whitelistUserIds = {38162374}
+local collect = Collect(game.Players:GetPlayers()):whereIn("UserId", whitelistUserIds)
+print(collect:get()) --> {MayorGnarwhal}
+```
+```lua
+local collect = Collect({1, 2, 3, 4, 5}):whereIn({1, 3, 5})
+print(collect:get()) --> {1, 3, 5}
+```
+
+
+## `whereNotIn()`
+Filters collection to values that are not found in a given array
+### Parameters
+|     |     |     |
+| --- | --- | --- |
+| **path** | *string?* | Relative path from each entry to the value to be compared <br> **Default Value:** `"."` |
+| **haystack** | *table \| Collect* | Array in which to search |
+
+### Code Samples
+```lua
+local blacklistUserIds = {38162374}
+local collect = Collect(game.Players:GetPlayers()):whereNotIn("UserId", blacklistUserIds)
+print(collect:get()) --> {MayorGnarwhal}
+```
+```lua
+local collect = Collect({1, 2, 3, 4, 5}):whereNotIn({1, 3, 5})
+print(collect:get()) --> {2, 4}
+```
