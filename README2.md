@@ -214,3 +214,58 @@ print(collect:get()) --> {MayorGnarwhal}
 local collect = Collect({1, 2, 3, 4, 5}):whereNotIn({1, 3, 5})
 print(collect:get()) --> {2, 4}
 ```
+
+
+## `whereNil()`
+Filters collection to values that are nil at the given path
+### Parameters
+| **path** | *string* | Relative path from each entry to the value to be compared |
+| --- | --- | --- |
+
+
+## `whereNotNil()`
+### Aliases
+* `whereHas()`
+
+Filters collection to values that are nil at the given path
+### Parameters
+| **path** | *string* | Relative path from each entry to the value to be compared |
+| --- | --- | --- |
+
+### Code Samples
+```lua
+local loadedPlayers = Collect(game.Players:GetPlayers()):whereNotNil("Character")
+```
+
+
+## `whereOfType()`
+Filters collection to values where `typeof(value) == type`
+### Parameters
+|     |     |     |
+| --- | --- | --- |
+| **path** | *string?* | Relative path from each entry to the value to be compared <br> **Default Value:** `"."` |
+| **type** | *string* | The variable type in which to match |
+
+### Code Samples
+```lua
+local collect = Collect({1, "Two", 3, Enum.KeyCode.Four, "Five"}):whereOfType("string")
+print(collect:get()) --> {"Two", "Five"}
+```
+
+
+## `whereNotOfType`
+Filters collection to values where `typeof(value) ~= type`
+### Parameters
+|     |     |     |
+| --- | --- | --- |
+| **path** | *string?* | Relative path from each entry to the value to be compared <br> **Default Value:** `"."` |
+| **type** | *string* | The variable type in which to match |
+
+
+## `chunk()`
+Filters collection to values where `typeof(value) ~= type`
+### Parameters
+|     |     |     |
+| --- | --- | --- |
+| **path** | *string?* | Relative path from each entry to the value to be compared <br> **Default Value:** `"."` |
+| **type** | *string* | The variable type in which to match |
