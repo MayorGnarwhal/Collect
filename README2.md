@@ -1,8 +1,5 @@
 # Table of Contents
 * [Introduction](#introduction)
-    * [Creating Collections](#creating-collections)
-    * [Extending Collect](#extending-collect)
-    * [Packages](#packages)
 * [Available Methods](#available-methods)
     * [Constructors](#constructors)
     * [Filters](#filters)
@@ -11,6 +8,8 @@
     * [Getters](#getters)
     * [Update](#update)
     * [Iterators](#iterators)
+* [Extending Collect](#extending-collect)
+    * [Packages](#packages)
 
 
 # Introduction
@@ -19,72 +18,6 @@ Collect supports simple arrays to complex nested dictonaries
 
 This project was heavily inspired by Laravel [Collections](https://laravel.com/docs/10.x/collections) and the Laravel [Query Builder](https://laravel.com/docs/10.x/queries).
 Much of Collect's methods share the same names as their Laravel counterparts.
-
-
-## Creating Collections
-A standard Collect object can be created with the `new` constructor.
-```lua
-local collect = Collect.new({1, 2, 3})
-```
-
-Following Laravel standards, the Collect module is also callable as a function, using the `new` constructor under the hood. For the purposes of the documentation, this will be the standard that is used.
-```lua
-local collect = Collect({1, 2, 3}
-```
-
-When creating a Collect object with the `new` constructor, a reference to the provided table is used. To create a Collect object with a clone of a table, use the `clone` constructor, which will deep copy the provided table before creating an object.
-```lua
-local ValueModule = require(game.ReplicatedStorage.GameValues)
-
-local collect = Collect.clone(ValueModule)
-```
-
-### Other Constructors
-Collect also implements the `create` constructor from Roblox's [table library](https://create.roblox.com/docs/reference/engine/libraries/table#create), accepting a number indicating the table size, and a value that will be populated in each index.
-```lua
-local collect = Collect.create(3, "Roblox")
-print(collect:get()) --> {"Roblox", "Roblox", "Roblox"}
-```
-
-The `create` constructor also accepts functions as a valid value argument, acting as a closure that is called to determine the value at each index.
-```lua
-local collect = Collect.create(5, function(index)
-    return index * 2
-end)
-
-print(collect:get()) --> {2, 4, 6, 8, 10}
-```
-
-
-## Extending Collect
-The Collect module is "macroable", allowing you to add additional methods to the module at run time. The `macro` method accepts a closure that is called when your macro is called. This closure is passed the current Collect object, providing access to the Collection's methods. The closure must return the existing, or a new, Collect object.
-```lua
-Collect:macro("toUpper", function(collect)
-    return collect:map(function(value, key)
-        return string.upper(value)
-    end)
-end)
-
-local collect = Collect({"hello", "world"}):toUpper()
-print(collect:get()) --> {"HELLO", "WORLD"}
-```
-
-### Macro Arguments
-If necessary, you may define macros that accept additional arguments.
-```lua
-Collect:macro("multiplyBy", function(collect, mult)
-    return collect:map(function(value, key)
-        return value * mult
-    end)
-end)
-
-local collect = Collect({1, 2, 3}):multiplyBy(10)
-print(collect:get()) --> {10, 20, 30}
-```
-
-## Packages
-For easily packagable Collect macros, Collect comes with an optional `macros` module (case-sensitive) that will automatically create the macros on run-time. This will allow you to create your own Collect packages that provide more specialized functionality. This Collect module comes pre-equiped with the `instances` package, that includes various additional methods for handling Instance objects.
-
 
 
 # Available Methods
@@ -98,7 +31,7 @@ There are various types of methods that Collect offers that interact with the co
 | **[Mutators](#mutators)** | Mutates the structure of the collection. Returns a new Collect object |
 | **[Sorters](#sorters)** | Changes how the collection is ordered. Only applicable for array collections. Changes the underlying table |
 | **[Getters](#getters)** | Gets some information from the collection. Does not change collection |
-| **[Update](#update)** | Changes underlying table |
+| **[Update](#update)** | Changes the underlying table |
 | **[Iterators](#iterators)** | Iterates through the collection |
 
 
@@ -151,6 +84,8 @@ Creates a new Collect object of a specified length populated by a given value or
 ```
 
 
+
+# Filters
 ## `filter()`
 Filters the collection using the given closure, keeping only entries that return truthy.
 ### Parameters
@@ -347,6 +282,8 @@ Filters collection to values where `typeof(value) ~= type`
 | **type** | *string* | The variable type in which to match |
 
 
+
+# Mutators
 ## `chunk()`
 Breaks collection into multiple smaller tables of a given size
 ### Parameters
@@ -560,8 +497,8 @@ Counts duplicate occurences of values in the collection
 ### Code Samples
 ```lua
 local collect = Collect({
-	{ProductId = "ABC", Name = "Object1"},
-	{ProductId = "XYZ", Name = "Object2"},
+    {ProductId = "ABC", Name = "Object1"},
+    {ProductId = "XYZ", Name = "Object2"},
 })
 
 local keyed = collect:keyBy("ProductId")
@@ -590,6 +527,8 @@ print(keyed:get()) -->
 
 ## `keys()`
 Returns all of the collection's keys
+
+### Code Samples
 ```lua
 local collect = Collect({
     ["ABC"] = {ProductId = "ABC", Name = "Object1"},
@@ -599,3 +538,257 @@ local collect = Collect({
 local keys = collect:keys()
 print(keys:get()) --> {"ABC", "XYZ"}
 ```
+
+
+## `map()`
+Re-maps the values of the collection by a given closure.
+### Parameters
+| **closure** | *function* | Closure used for re-mapping. Returned value overwrites current value |
+| :-- | :-- | :-- |
+
+### Code Samples
+```lua
+local collect = Collect({1, 2, 3, 4, 5})
+
+collect = collect:map(function(value, key)
+    return value * 2
+end)
+print(collect:get()) --> {2, 4, 6, 8, 10}
+```
+
+
+## `mapWithKeys()`
+Re-maps entire collection by a given closure. The closure should return a key, pair tuple that will become the new entry.
+### Parameters
+| **closure** | *function* | Closure used for re-mapping. Returned key, value pair overwrites current entry |
+| :-- | :-- | :-- |
+
+### Code Samples
+```lua
+local collect = Collect({
+    {ProductId = "ABC", Name = "Object1"},
+    {ProductId = "XYZ", Name = "Object2"},
+})
+
+collect = collect:mapWithKeys(function(value, key)
+    return value.ProductId, value.Name
+end)
+print(collect:get()) -->
+--[[
+    ["ABC"] = "Object1",
+    ["XYZ"] = "Object2",
+]]
+```
+
+
+## `nth()`
+Creates a collection consisting of every n-th element, starting at an optional offset
+### Parameters
+|     |     |     |
+| :-- | :-- | :-- |
+| **frequency** | *number* |  |
+| **offset** | *number?* | Offset index to start pulling from |
+
+### Code Samples
+```lua
+local collect = Collect({1, 2, 3, 4, 5, 6, 7, 8})
+
+collect = collect:nth(3)
+print(collect:get()) --> {1, 4, 7}
+```
+```lua
+local collect = Collect({1, 2, 3, 4, 5, 6, 7, 8})
+
+collect = collect:nth(3, 2)
+print(collect:get()) --> {2, 5, 8}
+```
+
+
+## `pluck()`
+Re-maps collection to values at a given path. Optionally can specify how remapped collection should be keyed.
+### Parameters
+|     |     |     |
+| :-- | :-- | :-- |
+| **path** | *string* | Path to value |
+| **keyPath** | *string?* | Path to value used to key |
+
+### Code Samples
+```lua
+local collect = Collect({
+    {ProductId = "ABC", Name = "Object1"},
+    {ProductId = "XYZ", Name = "Object2"},
+})
+
+collect = collect:pluck("ProductId")
+print(collect:get()) --> {"ABC", "XYZ"}
+```
+
+
+## `skip()`
+Removes the given number of elements from the beginning of the collection. If the number number is less than 1, then a percentage of the collection's length is skipped
+### Parameters
+| **count** | *number* | Number or proportion of elements to skip |
+| :-- | :-- | :-- |
+
+### Code Samples
+```lua
+local collect = Collect({1, 2, 3, 4, 5, 6, 7, 8})
+
+collect = collect:skip(4)
+print(collect:get()) --> {5, 6, 7, 8}
+```
+```lua
+local collect = Collect({1, 2, 3, 4, 5, 6, 7, 8})
+
+collect = collect:skip(0.5)
+print(collect:get()) --> {5, 6, 7, 8}
+```
+
+
+## `skipUntil()`
+Removes elements from the beginning of the collection until a given closure returns truthy. Optionally, a simple value can be passed to skip until that value is found
+### Parameters
+| **closure** | *function \| any* | Used to determine when skipping ends |
+| :-- | :-- | :-- |
+
+### Code Samples
+```lua
+local collect = Collect({1, 2, 3, 4, 5})
+
+collect = collect:skipUntil(function(value, key)
+    return value >= 3
+end)
+print(collect:get()) --> {3, 4, 5}
+```
+```lua
+local collect = Collect({1, 2, 3, 4, 5})
+
+collect = collect:skipUntil(3)
+print(collect:get()) --> {3, 4, 5}
+```
+
+
+## `skipWhile()`
+Removes elements from the beginning of the collection while a given closure returns truthy
+### Parameters
+| **closure** | *function \| any* | Used to determine when skipping ends |
+| :-- | :-- | :-- |
+
+### Code Samples
+```lua
+local collect = Collect({1, 2, 3, 4, 5})
+
+collect = collect:skipWhile(function(value, key)
+    return value <= 3
+end)
+print(collect:get()) --> {4, 5}
+```
+
+
+## `slice()`
+Returns the slice of the collection from [`startIndex`, `endIndex`]. The collection's underlying table must be an array
+### Parameters
+|     |     |     |
+| :-- | :-- | :-- |
+| **startIndex** | *number* | Inclusive starting index of the slice |
+| **endIndex** | *number?* | Inclusive end index of the slice. <br> **Default Value:** Length of collection |
+
+### Code Samples
+```lua
+local collect = Collect({1, 2, 3, 4, 5})
+
+collect = collect:slice(2, 4)
+print(collect:get()) --> {2, 3, 4}
+```
+```lua
+local collect = Collect({1, 2, 3, 4, 5})
+
+collect = collect:slice(2)
+print(collect:get()) --> {2, 3, 4, 5}
+```
+
+
+## `split()`
+Splits the collection into a given number of groups
+### Parameters
+| **numGroups** | *number* | Number of groups to create |
+| :-- | :-- | :-- |
+
+### Code Samples
+```lua
+local collect = Collect({1, 2, 3, 4, 5})
+
+collect = collect:split(3)
+print(collect:get()) --> {{1, 2}, {3, 4}, {5}}
+```
+
+
+
+# Updates
+## `insert()`
+Inserts a value into the collection. The collection's underlying table must be an array.
+### Parameters
+|     |     |     |
+| :-- | :-- | :-- |
+| **position** | *number?* | Position to insert value at. If not given, then value is appended to the end of the collection |
+| **value** | *any* | Value to insert into collection |
+
+### Code Samples
+```lua
+local collect = Collect({"a", "b", "c"})
+
+collect:insert(1, "d")
+print(collect:get()) -> {"d", "a", "b", "c"}
+```
+```lua
+local collect = Collect({"a", "b", "c"})
+
+collect:insert("d")
+print(collect:get()) -> {"a", "b", "c", "d"}
+```
+
+
+## `merge()`
+Merges a given table into the collection. Changes the underlying table.
+### Parameters
+| **tbl** | *table \| Collect* | Table to be merged |
+| :-- | :-- | :-- |
+
+### Code Samples
+```lua
+local collect = Collect({1, 2, 3})
+
+collect:merge({"a", "b", "c"})
+print(collect:get()) -> {1, 2, 3, "a", "b", "c"}
+```
+
+
+
+# Extending Collect
+The Collect module is "macroable", allowing you to add additional methods to the module at run time. The `macro` method accepts a closure that is called when your macro is called. This closure is passed the current Collect object, providing access to the Collection's methods. The closure must return the existing, or a new, Collect object.
+```lua
+Collect:macro("toUpper", function(collect)
+    return collect:map(function(value, key)
+        return string.upper(value)
+    end)
+end)
+
+local collect = Collect({"hello", "world"}):toUpper()
+print(collect:get()) --> {"HELLO", "WORLD"}
+```
+
+### Macro Arguments
+If necessary, you may define macros that accept additional arguments.
+```lua
+Collect:macro("multiplyBy", function(collect, mult)
+    return collect:map(function(value, key)
+        return value * mult
+    end)
+end)
+
+local collect = Collect({1, 2, 3}):multiplyBy(10)
+print(collect:get()) --> {10, 20, 30}
+```
+
+# Packages
+For easily packagable Collect macros, Collect comes with an optional `macros` module (case-sensitive) that will automatically create the macros on run-time. This will allow you to create your own Collect packages that provide more specialized functionality. This Collect module comes pre-equiped with the `instances` package, that includes various additional methods for handling Instance objects.
