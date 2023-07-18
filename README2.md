@@ -98,11 +98,57 @@ There are various types of methods that Collect offers that interact with the co
 | **[Mutators](#mutators)** | Mutates the structure of the collection. Returns a new Collect object |
 | **[Sorters](#sorters)** | Changes how the collection is ordered. Only applicable for array collections. Changes the underlying table |
 | **[Getters](#getters)** | Gets some information from the collection. Does not change collection |
-| **[Update](#update)** | Update values in the collection |
+| **[Update](#update)** | Changes underlying table |
 | **[Iterators](#iterators)** | Iterates through the collection |
 
 
 # Constructors
+## `new()`
+### Parameters
+Create a new Collect object with a table.
+| **tbl** | *table \| Collect?* | Table used in Collect object. If tbl is another Collect object, then its underlying table is used. <br> **Default Value:** `{}` |
+| --- | --- | :-- |
+
+### Code Samples
+```lua
+local tbl = {1, 2, 3, 4}
+local collect = Collect.new(tbl)
+print(collect:get()) --> {1, 2, 3, 4}
+print(collect:get() == tbl) --> true
+```
+
+`new()` is called internally with the `__call` metamethod, allowing you to call the Collect module as a function.
+```lua
+local collect = Collect({1, 2, 3, 4})
+print(collect:get()) --> {1, 2, 3, 4}
+```
+
+## `clone()`
+### Parameters
+Creates a new Collect object with a deep copy of the given table
+| **tbl** | *table \| Collect?* | Table used in Collect object. If tbl is another Collect object, then its underlying table is used. <br> **Default Value:** `{}` |
+| --- | --- | :-- |
+```lua
+local tbl = {1, 2, 3, 4}
+local collect = Collect.new(tbl)
+print(collect:get()) --> {1, 2, 3, 4}
+print(collect:get() == tbl) --> false
+```
+
+
+## `create()`
+### Parameters
+Creates a new Collect object of a specified length populated by a given value or closure
+|     |     |     |
+| --- | --- | --- |
+| **count** | *number* | Length of the new collection |
+| **value** | *any \| function* | The value put in each entry. If value is a function, then the return value of the closure is used |
+
+### Code Samples
+```lua
+
+
+```
 
 
 ## `filter()`
