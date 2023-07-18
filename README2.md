@@ -4,6 +4,13 @@
     * [Extending Collect](#extending-collect)
     * [Packages](#packages)
 * [Available Methods](#available-methods)
+    * [Constructors](#constructors)
+    * [Filters](#filters)
+    * [Mutators](#mutators)
+    * [Sorters](#sorters)
+    * [Getters](#getters)
+    * [Update](#update)
+    * [Iterators](#iterators)
 
 
 # Introduction
@@ -82,6 +89,20 @@ For easily packagable Collect macros, Collect comes with an optional `macros` mo
 
 # Available Methods
 For the majority of the remaining Collect documentation, we will look at each method available on the `Collect` module. All of these methods can be chained to fluentry manipulate the underlying table. Most methods will return a new Collect object, allowing preservation of the original collection with necessary.
+
+There are various types of methods that Collect offers that interact with the collection in various different ways.
+|     |     |
+| :-- | :-- |
+| **[Constructors](#constructors)** | Creates a new Collect object |
+| **[Filters](#filters)** | Removes entries from collection. Returns a new Collect object |
+| **[Mutators](#mutators)** | Mutates the structure of the collection. Returns a new Collect object |
+| **[Sorters](#sorters)** | Changes how the collection is ordered. Only applicable for array collections. Changes the underlying table |
+| **[Getters](#getters)** | Gets some information from the collection. Does not change collection |
+| **[Update](#update)** | Update values in the collection |
+| **[Iterators](#iterators)** | Iterates through the collection |
+
+
+# Constructors
 
 
 ## `filter()`
