@@ -92,11 +92,12 @@ Filters the collection using the given closure, keeping only entries that return
 
 ### Code Samples
 ```lua
-local collect = Collect({1, 2, 3, 4}):filter(function(value, key)
+local collect = Collect({1, 2, 3, 4})
+
+local filtered = collect:filter(function(value, key)
     return value > 2
 end)
-
-print(collect:get()) --> {3, 4}
+print(filtered:get()) --> {3, 4}
 ```
 
 
@@ -108,11 +109,12 @@ Filters the collection using the given closure, keeping only entries that do not
 
 ### Code Samples
 ```lua
-local collect = Collect({1, 2, 3, 4}):reject(function(value, key)
+local collect = Collect({1, 2, 3, 4})
+
+local filtered = collect:reject(function(value, key)
     return value > 2
 end)
-
-print(collect:get()) --> {1, 2}
+print(filtered:get()) --> {1, 2}
 ```
 
 
@@ -127,20 +129,29 @@ Filters collection using a given equation, keeping only entries that evalaute tr
 
 ### Code Samples
 ```lua
-local collect = Collect(game.Players:GetPlayers()):where("Character.Humanoid.Health", ">=", 50)
-print(collect:get()) --> {Player1, Player2}
+local players = Collect(game.Players:GetPlayers())
+
+local healthyPlayers = players:where("Character.Humanoid.Health", ">=", 50)
+print(healthyPlayers:get()) --> {Player1, Player2}
 ```
 ```lua
-local collect = Collect(game.Players:GetPlayers()):where("UserId", 38162374)
-print(collect:get()) --> {MayorGnarwhal}
+local ownerId = 38162374
+local players = Collect(game.Players:GetPlayers())
+
+local owners = players:where("UserId", ownerId)
+print(owners:get()) --> {MayorGnarwhal}
 ```
 ```lua
-local collect = Collect({1, 2, 3, 4, 5}):where(">=", 3)
-print(collect:get()) --> {3, 4, 5}
+local collect = Collect({1, 2, 3, 4, 5})
+
+local filtered = collect:where(">=", 3)
+print(filtered:get()) --> {3, 4, 5}
 ```
 ```lua
-local collect = Collect(game.Players:GetPlayers()):where(game.Players.MayorGnarwhal)
-print(collect:get()) --> {MayorGnarwhal}
+local collect = Collect({1, 2, 2, 3, 4})
+
+local filtered = collect:where(2)
+print(collect:get()) --> {2, 2}
 ```
 
 
@@ -155,8 +166,10 @@ Filters collections that entries whose numerical values are within [min, max]
 
 ### Code Samples
 ```lua
-local collect = Collect({1, 2, 3, 4, 5}):whereBetween(2, 4)
-print(collect:get()) --> {2, 3, 4}
+local collect = Collect({1, 2, 3, 4, 5})
+
+local filtered = :whereBetween(2, 4)
+print(filtered:get()) --> {2, 3, 4}
 ```
 
 
@@ -171,8 +184,10 @@ Filters collections that entries whose numerical values are not within [min, max
 
 ### Code Samples
 ```lua
-local collect = Collect({1, 2, 3, 4, 5}):whereNotBetween(2, 4)
-print(collect:get()) --> {1, 5}
+local collect = Collect({1, 2, 3, 4, 5})
+
+local filtered = collect:whereNotBetween(2, 4)
+print(filtered:get()) --> {1, 5}
 ```
 
 
@@ -186,13 +201,17 @@ Filters collection to values found in a given array
 
 ### Code Samples
 ```lua
-local whitelistUserIds = {38162374}
-local collect = Collect(game.Players:GetPlayers()):whereIn("UserId", whitelistUserIds)
-print(collect:get()) --> {MayorGnarwhal}
+local adminUserIds = {38162374}
+local players = Collect(game.Players:GetPlayers())
+
+local admins = players:whereIn("UserId", adminUserIds)
+print(admins:get()) --> {MayorGnarwhal}
 ```
 ```lua
-local collect = Collect({1, 2, 3, 4, 5}):whereIn({1, 3, 5})
-print(collect:get()) --> {1, 3, 5}
+local collect = Collect({1, 2, 3, 4, 5})
+
+local filtered = collect:whereIn({1, 3, 5, 8})
+print(filtered:get()) --> {1, 3, 5}
 ```
 
 
@@ -206,13 +225,10 @@ Filters collection to values that are not found in a given array
 
 ### Code Samples
 ```lua
-local blacklistUserIds = {38162374}
-local collect = Collect(game.Players:GetPlayers()):whereNotIn("UserId", blacklistUserIds)
-print(collect:get()) --> {MayorGnarwhal}
-```
-```lua
-local collect = Collect({1, 2, 3, 4, 5}):whereNotIn({1, 3, 5})
-print(collect:get()) --> {2, 4}
+local collect = Collect({1, 2, 3, 4, 5})
+
+local filtered = collect:whereNotIn({1, 3, 5, 8})
+print(filtered:get()) --> {2, 4}
 ```
 
 
@@ -248,8 +264,10 @@ Filters collection to values where `typeof(value) == type`
 
 ### Code Samples
 ```lua
-local collect = Collect({1, "Two", 3, Enum.KeyCode.Four, "Five"}):whereOfType("string")
-print(collect:get()) --> {"Two", "Five"}
+local collect = Collect({1, "Two", 3, Enum.KeyCode.Four, "Five"})
+
+local strings = collect:whereOfType("string")
+print(strings:get()) --> {"Two", "Five"}
 ```
 
 
@@ -263,9 +281,254 @@ Filters collection to values where `typeof(value) ~= type`
 
 
 ## `chunk()`
-Filters collection to values where `typeof(value) ~= type`
+Breaks collection into multiple smaller tables of a given size
 ### Parameters
 |     |     |     |
 | --- | --- | --- |
 | **path** | *string?* | Relative path from each entry to the value to be compared <br> **Default Value:** `"."` |
 | **type** | *string* | The variable type in which to match |
+
+### Code Samples
+```lua
+local collect = Collect({1, 2, 3, 4, 5, 6, 7})
+
+local chunks = collect:chunk(4)
+print(chunks:get()) --> {{1, 2, 3, 4}, {5, 6, 7}}
+```
+
+
+## `chunkWhile()`
+Breaks collection into multiple smaller tables, appending the current chunk while the closure returns truthy
+### Parameters
+| **closure** | *function* | Closure used in forming chunks. If returned value is truthy, a new chunk is created |
+| --- | --- | --- |
+
+### Code Samples
+```lua
+local collect = Collect({1, 1, 2, 2, 3, 3, 3, 4})
+
+local chunks = collect:chunkWhile(function(value, key, chunk)
+    return value == chunk[#chunk]
+end)
+print(chunks:get()) --> {{1, 1}, {2, 2}, {3, 3, 3}, {4}}
+```
+
+
+## `countBy()`
+Counts the occurences of values in the collection
+### Parameters
+| **determineValue** | *string? \| function?* | Method for determining value to count. Can be a path, or a closure who's return value is the counted value. If `nil`, then the method counts each element |
+| :-- | :-- | :-- |
+
+### Code Samples
+```lua
+local collect = Collect({1, 1, 3, 4, 4, 4})
+
+local counted = collect:countBy()
+print(counted:get()) --> {[1] = 2, [3] = 1, [4] = 3}
+```
+```lua
+local collect = Collect({"alice@gmail.com", "bob@yahoo.com", "carlos@gmail.com"})
+
+local counted = collect:countBy(function(email, key)
+    return string.split(email, "@")[2]
+end)
+print(counted:get()) --> {["gmail.com"] => 2, ["yahoo.com"] => 1}
+```
+
+
+## `diffAssoc()`
+### Parameters
+Compares another table or collection's key, value pairs. Returns collection of key, value pairs not present in given table
+| **compare** | *table \| Collect* | Table used to compare key, value pairs |
+| :-- | :-- | :-- |
+
+### Code Samples
+```lua
+local collect = Collect({
+    color = BrickColor.Yellow();
+    count = 3;
+    foo = "bar";
+})
+
+local diff = collect:diffAssoc({
+    color = BrickColor.Green();
+    count = 3;
+    foo = "baz";
+    used = 2;
+})
+print(diff:get()) --> {color = BrickColor.Yellow(), foo = "bar"}
+```
+
+
+## `diffKeys()`
+### Parameters
+Compares against another table or collection based on its keys. Returns collection of key, value pairs in the original collection whose keys are not in the given collection.
+| **compare** | *table \| Collect* | Table used to compare key, value pairs |
+| :-- | :-- | :-- |
+
+### Code Samples
+```lua
+local collect = Collect({
+    color = BrickColor.Yellow();
+    count = 3;
+    used = 2;
+    foo = "bar";
+})
+
+local diff = collect:diffKeys({
+    color = BrickColor.Green();
+    count = 3;
+    baz = "bar";
+})
+print(diff:get()) --> {used = 2, foo = "bar"}
+```
+
+
+## `duplicates()`
+### Parameters
+Counts duplicate occurences of values in the collection
+| **determineValue** | *string? \| function?* | Method for determining value to count. Can be a path, or a closure who's return value is the counted value. If `nil`, then the method counts each element |
+| :-- | :-- | :-- |
+
+### Code Samples
+```lua
+local collect = Collect({1, 1, 2, 3, 4, 4, 4})
+
+local duplicates = collect:duplicates()
+print(duplicates:get()) --> {[1] = 2, [4] = 3}
+```
+
+
+## `flatten()`
+Flattens a multi-dimension collection to a single dimension, or until a specified depth is reached
+### Parameters
+Counts duplicate occurences of values in the collection
+| **depth** | *number?* | Maximum depth of flattening. <br> **Default:** `math.huge` |
+| :-- | :-- | :-- |
+
+### Code Samples
+```lua
+local collect = Collect({
+    name = "Bob",
+    numbers = {1, 2}
+})
+
+local flattened = collect:flatten()
+print(flattened:get()) --> {"Bob", 1, 2}
+```
+```lua
+local collect = Collect({
+    Challenge1 = {
+        Difficulty = "Easy";
+        Reward = {
+            Type = "Cash";
+            Value = 100;
+        };
+    };
+    Challenge2 = {
+        Difficulty = "Medium";
+        Reward = {
+            Type = "XP";
+            Value = 250;
+        };
+    }
+})
+
+local flattened = collect:flatten(1)
+print(flattened:get()) --> 
+--[[
+    [1] = {
+        Difficulty = "Easy";
+        Reward = {Type = "Cash", Value = 100};
+    };
+    [2] = {
+        Difficulty = "Medium";
+        Reward = {Type = "XP", Value = 250};
+    };
+]]
+```
+
+
+## `groupBy()`
+Groups the collection's entries by a given path or closure
+### Parameters
+| **determineGroup** | *string? \| function?* | Method for determining an entry's group. Can be a path, or a closure whose return value is the group. If `nil`, then the method groups by elements |
+| :-- | :-- | :-- |
+
+### Sample Code
+```lua
+local collect = Collect({
+    Challenge1 = {Difficulty = "Easy"},
+    Challenge2 = {Difficulty = "Easy"},
+    Challenge3 = {Difficulty = "Medium"},
+    Challenge4 = {Difficulty = "Hard"},
+    Challenge5 = {Difficulty = "Hard"},
+})
+
+local grouped = collect:groupBy("Difficulty")
+print(grouped:get()) --> 
+--[[
+    Easy = {
+        Challenge1 = {Difficulty = "Easy"},
+        Challenge2 = {Difficulty = "Easy"},
+    };
+    Medium = {
+        Challenge3 = {Difficulty = "Medium"},
+    };
+    Hard = {
+        Challenge5 = {Difficulty = "Hard"},
+    };
+]]
+```
+
+
+## `keyBy()`
+Re-keys the collection by a given path or closure. If the same key is set multiple times, then only the last one will appear in the new collection
+### Parameters
+Counts duplicate occurences of values in the collection
+| **determineKey** | *string \| function* | Method for determining new keys. Can be a path, or a closure whose return value is the new key. |
+| :-- | :-- | :-- |
+
+### Code Samples
+```lua
+local collect = Collect({
+	{ProductId = "ABC", Name = "Object1"},
+	{ProductId = "XYZ", Name = "Object2"},
+})
+
+local keyed = collect:keyBy("ProductId")
+print(keyed:get()) -->
+--[[
+    ["ABC"] = {ProductId = "ABC", Name = "Object1"},
+    ["XYZ"] = {ProductId = "XYZ", Name = "Object2"},
+]]
+```
+```lua
+local collect = Collect({
+	{ProductId = "ABC", Name = "Object1"},
+	{ProductId = "XYZ", Name = "Object2"},
+})
+
+local keyed = collect:keyBy(function(value, key)
+    return string.lower(value.ProductId)
+end)
+print(keyed:get()) -->
+--[[
+    ["abc"] = {ProductId = "ABC", Name = "Object1"},
+    ["xyz"] = {ProductId = "XYZ", Name = "Object2"},
+]]
+```
+
+
+## `keys()`
+Returns all of the collection's keys
+```lua
+local collect = Collect({
+    ["ABC"] = {ProductId = "ABC", Name = "Object1"},
+    ["XYZ"] = {ProductId = "XYZ", Name = "Object2"},
+})
+
+local keys = collect:keys()
+print(keys:get()) --> {"ABC", "XYZ"}
+```
