@@ -1,23 +1,19 @@
 # Table of Contents
 * [Introduction](#introduction)
 * [Available Methods](#available-methods)
-    * [Constructors](#constructors)
-    * [Filters](#filters)
-    * [Mutators](#mutators)
-    * [Sorters](#sorters)
-    * [Getters](#getters)
-    * [Update](#update)
-    * [Iterators](#iterators)
+* [Metamethods](#metamethods)
 * [Extending Collect](#extending-collect)
     * [Packages](#packages)
 
 
 # Introduction
-Collect is a fluent and convenient wrapper for tables in Roblox Lua, designed for both simple and complex table manipulation.
-Collect supports simple arrays to complex nested dictonaries
-
 This project was heavily inspired by Laravel [Collections](https://laravel.com/docs/10.x/collections) and the Laravel [Query Builder](https://laravel.com/docs/10.x/queries).
 Much of Collect's methods share the same names as their Laravel counterparts.
+
+Collect is a fluent and convenient wrapper for tables in Roblox Luau, designed for both simple and complex table manipulation. Collect supports simple arrays to complex nested dictonaries, being able to differentiate between the two, and automatically treat arrays and dictonaries differently. For example, if a Collect object is created with an array, then it will maintain that structure as values are added and removed from the collection.
+
+Along with providing various methods for table manipulation, Collect objects can also be handled very similarily to standard Luau tables. Making use of [metamethods](#metamethods), Collect implements features such as [negative indexing](#__index) and [dictonary length](#__len).
+
 
 
 # Available Methods
@@ -46,6 +42,7 @@ Create a new Collect object with a table.
 ```lua
 local tbl = {1, 2, 3, 4}
 local collect = Collect.new(tbl)
+
 print(collect:get()) --> {1, 2, 3, 4}
 print(collect:get() == tbl) --> true
 ```
@@ -64,6 +61,7 @@ Creates a new Collect object with a deep copy of the given table
 ```lua
 local tbl = {1, 2, 3, 4}
 local collect = Collect.new(tbl)
+
 print(collect:get()) --> {1, 2, 3, 4}
 print(collect:get() == tbl) --> false
 ```
@@ -79,8 +77,15 @@ Creates a new Collect object of a specified length populated by a given value or
 
 ### Code Samples
 ```lua
+local collect = Collect.create(5, 1)
+print(collect:get()) --> {1, 1, 1, 1, 1}
+```
+```
+local collect = Collect.create(5, function(i)
+    return i
+end)
 
-
+print(collect:get()) --> {1, 2, 3, 4, 5}
 ```
 
 
@@ -722,6 +727,9 @@ collect = collect:split(3)
 print(collect:get()) --> {{1, 2}, {3, 4}, {5}}
 ```
 
+## `count()`
+
+
 
 
 # Updates
@@ -761,6 +769,69 @@ local collect = Collect({1, 2, 3})
 collect:merge({"a", "b", "c"})
 print(collect:get()) -> {1, 2, 3, "a", "b", "c"}
 ```
+
+
+
+# Metamethods
+Collect implements various Lua metamethods to make working with Collect objects as similar to standard tables as possible, with the added bonus of increased functionality. 
+
+## `__index`
+Fires when `collect[key]` is indexed. Implements negative array indexing, allowing you to index from the back of an array with negative numbers.
+```lua
+local collect = Collect({1, 2, 3, 4, 5})
+print(collect[-1]) --> 5
+```
+
+
+## `__newindex`
+Fires when `collect[key]` is attempted to be set (ie. `collect[key] = value`). Implements negative array indexing, allowing you to index from the back of an array with negative numbers.
+```lua
+local collect = Collect({1, 2, 3, 4, 5})
+
+collect[1] = 10
+collect[-1] *= 10
+print(collect:get()) --> {10, 2, 3, 4, 50}
+```
+
+
+## `__len`
+Fires when the `#` operator is used (ie `#collect`). Implements the ability to count the length of a dictonary. This metamethod is simply a call to the [:count()](#count) method.
+```lua
+local collect = Collect({
+    a = 1,
+    b = 2,
+})
+
+print(#collect) --> 2
+```
+
+
+## `__eq`
+Fires when the `==` is used to compare the equality of two Collect objects. Unlike the `==` operator with standard tables, this metamethod **does not compare the table's pointer**, but rather that each key, value pair is shared between the two tables. This metamethod is simply a call to the [:equals()](#equals) method.
+```lua
+local collect = Collect({
+    a = 1,
+    b = 2,
+})
+local collect2 = Collect({
+    b = 2,
+    a = 1,
+})
+
+print(collect1 == collect2) --> true
+```
+To instead compare the table pointers of two Collect objects, use the [:get()](#get) method.
+```lua
+local tablePointer = {1, 2, 3}
+local collect1 = Collect(tablePointer)
+local collect2 = Collect(tablePointer)
+
+print(collect1:get() == collect2:get()) --> true
+```
+
+
+## `__pairs` and `__ipairs`
+Unfortunately, Roblox Luau does not support the use of the `__pairs` and `__ipairs` metamethods. Instead, you can make use of the [:forEach()](#forEach) method for iteration, or simply iterate the underlying table with the [:get()](#get) method.
 
 
 
