@@ -22,11 +22,11 @@ For the majority of the remaining Collect documentation, we will look at each me
 There are various types of methods that Collect offers that interact with the collection in various different ways.
 |     |     |
 | :-- | :-- |
-| **[Constructors](#constructors)** | Creates a new Collect object |
+| **[Constructors](#constructors)** | Creates a new Collect object using a standard Luau table |
 | **[Filters](#filters)** | Removes entries from collection. Returns a new Collect object |
 | **[Mutators](#mutators)** | Mutates the structure of the collection. Returns a new Collect object |
 | **[Sorters](#sorters)** | Changes how the collection is ordered. Only applicable for array collections. Changes the underlying table |
-| **[Getters](#getters)** | Gets some information from the collection. Does not change collection |
+| **[Getters](#getters)** | Returns information about the collection. Does not change collection |
 | **[Update](#update)** | Changes the underlying table |
 | **[Iterators](#iterators)** | Iterates through the collection |
 
@@ -630,7 +630,7 @@ print(collect:get()) --> {"ABC", "XYZ"}
 
 
 ## `skip()`
-Removes the given number of elements from the beginning of the collection. If the number number is less than 1, then a percentage of the collection's length is skipped
+Removes the given number of elements from the beginning of the collection. If the number number is less than 1, then a percentage of the collection's length is skipped.
 ### Parameters
 | **count** | *number* | Number or proportion of elements to skip |
 | :-- | :-- | :-- |
@@ -651,7 +651,7 @@ print(collect:get()) --> {5, 6, 7, 8}
 
 
 ## `skipUntil()`
-Removes elements from the beginning of the collection until a given closure returns truthy. Optionally, a simple value can be passed to skip until that value is found
+Removes elements from the beginning of the collection until a given closure returns truthy. Optionally, a simple value can be passed to skip until that value is found.
 ### Parameters
 | **closure** | *function \| any* | Used to determine when skipping ends |
 | :-- | :-- | :-- |
@@ -674,7 +674,7 @@ print(collect:get()) --> {3, 4, 5}
 
 
 ## `skipWhile()`
-Removes elements from the beginning of the collection while a given closure returns truthy
+Removes elements from the beginning of the collection while a given closure returns truthy.
 ### Parameters
 | **closure** | *function \| any* | Used to determine when skipping ends |
 | :-- | :-- | :-- |
@@ -691,7 +691,7 @@ print(collect:get()) --> {4, 5}
 
 
 ## `slice()`
-Returns the slice of the collection from [`startIndex`, `endIndex`]. The collection's underlying table must be an array
+Returns the slice of the collection from [`startIndex`, `endIndex`]. The collection's underlying table must be an array.
 ### Parameters
 |     |     |     |
 | :-- | :-- | :-- |
@@ -714,7 +714,7 @@ print(collect:get()) --> {2, 3, 4, 5}
 
 
 ## `split()`
-Splits the collection into a given number of groups
+Splits the collection into a given number of groups.
 ### Parameters
 | **numGroups** | *number* | Number of groups to create |
 | :-- | :-- | :-- |
@@ -727,9 +727,233 @@ collect = collect:split(3)
 print(collect:get()) --> {{1, 2}, {3, 4}, {5}}
 ```
 
-## `count()`
+
+## `take()`
+Takes the given number of elements from the beginning of the collection. If the number number is less than 1, then a percentage of the collection's length is taken.
+### Parameters
+| **count** | *number* | Number or proportion of elements to take |
+| :-- | :-- | :-- |
+
+### Code Samples
+### Code Samples
+```lua
+local collect = Collect({1, 2, 3, 4, 5, 6, 7, 8})
+
+collect = collect:take(4)
+print(collect:get()) --> {1, 2, 3, 4}
+```
+```lua
+local collect = Collect({1, 2, 3, 4, 5, 6, 7, 8})
+
+collect = collect:take(0.5)
+print(collect:get()) --> {1, 2, 3, 4}
+```
 
 
+## `takeUntil()`
+Takes elements from the beginning of the collection until a given closure returns truthy. Optionally, a simple value can be passed to skip until that value is found.
+### Parameters
+| **closure** | *function \| any* | Used to determine when taking ends |
+| :-- | :-- | :-- |
+
+### Code Samples
+```lua
+local collect = Collect({1, 2, 3, 4, 5})
+
+collect = collect:takeUntil(function(value, key)
+    return value >= 3
+end)
+print(collect:get()) --> {1, 2}
+```
+```lua
+local collect = Collect({1, 2, 3, 4, 5})
+
+collect = collect:takeUntil(3)
+print(collect:get()) --> {1, 2, 3}
+```
+
+
+## `takeWhile()`
+Removes elements from the beginning of the collection while a given closure returns truthy.
+### Parameters
+| **closure** | *function \| any* | Used to determine when skipping ends |
+| :-- | :-- | :-- |
+
+### Code Samples
+```lua
+local collect = Collect({1, 2, 3, 4, 5})
+
+collect = collect:takeWhile(function(value, key)
+    return value <= 3
+end)
+print(collect:get()) --> {1, 2, 3}
+```
+
+
+## `toArray()`
+Turns a dictonary collection into an array of key, value pairs.
+### Code Samples
+```lua
+local collect = Collect({
+    a = 1,
+    b = 2,
+    c = 3,
+})
+
+collect = collect:toArray()
+print(collect:get()) -->
+--[[
+    {key = "a", value = 1},
+    {key = "b", value = 2},
+    {key = "c", value = 3},
+]]
+```
+
+
+## `unique()`
+Removes all duplicate values from collection.
+### Code Samples
+```lua
+local collect = Collect({1, 1, 2, 3, 3, 3, 4, 5})
+
+local unique = collect:unique()
+print(unique:get()) --> {1, 2, 3, 4, 5}
+```
+
+
+## `values()`
+Returns an array of the collection's values
+### Code Samples
+```lua
+local collect = Collect({
+    ["ABC"] = {ProductId = "ABC", Name = "Object1"},
+    ["XYZ"] = {ProductId = "XYZ", Name = "Object2"},
+})
+
+local values = collect:values()
+print(values:get()) -->
+--[[
+    {ProductId = "ABC", Name = "Object1"},
+    {ProductId = "XYZ", Name = "Object2"},
+]]
+```
+
+
+
+# Sorts
+Sort methods change the order of the collection's underlying table. If you do not wish to affect the underlying table, use the [.clone()](#clone) constructor.
+
+**Note:** All sort methods are only available for arrays. If a sort method is called on a dictonary collection, an error will be thrown.
+
+## `flip()`
+Reverses the order of the collection.
+### Code Samples
+```lua
+local collect = Collect({1, 2, 3, 4, 5})
+
+collect = collect:flip()
+print(collect:get()) --> {5, 4, 3, 2, 1}
+```
+
+
+## `sort()`
+Sorts the collection according to a given sort function. If no sort function is given, then collection is sorted in ascending order.
+### Parameters
+| **sortFunction** | *function?* | An optional comparison function used to sort. Recieves two elements, `a`, and `b`. If return value is truthy, then `a` will be ordered before `b` |
+| :-- | :-- | :-- |
+
+### Code Samples
+```lua
+local collect = Collect({1, 3, 4, 5, 2})
+
+collect:sort()
+print(collect:get()) --> {1, 2, 3, 4, 5}
+```
+```lua
+local collect = Collect({1, 3, 4, 5, 2})
+
+collect:sort(function(a, b)
+    return a > b
+end)
+print(collect:get()) --> {5, 4, 3, 2, 1}
+```
+
+
+## `sortDesc()`
+Sorts the collection in descending order.
+### Code Samples
+```lua
+local collect = Collect({1, 3, 4, 5, 2})
+
+collect:sortDesc()
+print(collect:get()) --> {5, 4, 3, 2, 1}
+```
+
+
+## `sortBy()`
+Sorts the collection in ascending order based on the values at a given path.
+### Parameters
+| **path** | *string* | Relative path from each entry to the value to be compared in sort |
+| :-- | :-- | :-- |
+
+### Code Samples
+```lua
+
+```
+
+
+## `sortByDesc()`
+Sorts the collection in descending order based on the values at a given path.
+### Parameters
+| **path** | *string* | Relative path from each entry to the value to be compared in sort |
+| :-- | :-- | :-- |
+
+
+## `shuffle()`
+Rearanges collection into a random order.
+### Parameters
+| **random** | *Random \| number* | [Random](https://create.roblox.com/docs/reference/engine/datatypes/Random) generator object or a random seed used for shuffle |
+| :-- | :-- | :-- |
+
+### Code Samples
+```lua
+local collect = Collect({1, 2, 3, 4, 5})
+
+local randomSeed = 1337
+collect:shuffle(randomSeed)
+print(collect:get()) --> {2, 4, 3, 5, 1}
+```
+
+
+## `weightedShuffle()`
+Rearanges collection into a random order based on weighted odds, with higher weights more likely to be at the beginning of the collection.
+### Parameters
+|     |     |     |
+| :-- | :-- | :-- |
+| **path** | *string?* | Relative path from each entry to the entry's weight |
+| **random** | *Random \| number* | [Random](https://create.roblox.com/docs/reference/engine/datatypes/Random) generator object or a random seed used for shuffle |
+
+### Code Samples
+```lua
+local collect = Collect({
+    {Value = "A", Weight = 20},
+    {Value = "B", Weight = 99999},
+    {Value = "C", Weight = 2},
+    {Value = "D", Weight = 50},
+    {Value = "E", Weight = 0.0001},
+})
+
+local randomSeed = 1337
+collect:weightedShuffle("Weight", randomSeed)
+print(collect:get()) -->
+--[[
+    {Value = "B", Weight = 99999},
+    {Value = "A", Weight = 20},
+    {Value = "D", Weight = 50},
+    {Value = "C", Weight = 2},
+    {Value = "E", Weight = 0.0001},
+]]
+```
 
 
 # Updates
