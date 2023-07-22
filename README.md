@@ -956,6 +956,235 @@ print(collect:get()) -->
 ```
 
 
+# Getters
+## `get()`
+Returns the collection's underlying table.
+
+
+## `average()`
+Returns the average value of the collection.
+### Parameters
+| **path?** | *string* | Relative path from each entry to the value to be averaged |
+| :-- | :-- | :-- |
+
+### Code Samples
+```lua
+local collect = Collect({1, 1, 2, 4})
+
+print(collect:average()) --> 3
+```
+
+
+## `collect()`
+Creates and returns a new Collect object that is a deep copy of the current collection.
+
+
+## `concat()`
+### Parameters
+Joins a collection into a string, combined by the glue.
+|     |     |     |
+| :-- | :-- | :-- |
+| **glue** | *string?* | Glue used to combine each entry <br> **Default Value:** `""` |
+| **startIndex** | *number?* |  |
+| **endIndex** | *number?* |  |
+
+### Code Samples
+```lua
+local collect = Collect({"Foo", "Bar", "Baz"})
+
+print(collect:concat()) --> "FooBarBaz"
+```
+```lua
+local collect = Collect({"Foo", "Bar", "Baz"})
+
+print(collect:concat(", ")) --> "Foo, Bar, Baz"
+```
+
+
+## `count()`
+### Aliases
+* `length()`
+  
+Returns the number of key, value pairs in the collection. This method also works for the length of dictonaries. Called internally by the [`__len`](#__len) metamethod, allowing the use of the `#` operator.
+### Code Samples
+```lua
+local collect = Collect({1, 2, 3, 4, 5})
+
+print(collect:count()) --> 5
+```
+```lua
+local collect = Collect({a = 1, b = 2, c = 3})
+
+print(collect:count()) --> 3
+```
+
+
+## `equals()`
+Returns a boolean indicating if the given table has all of the same key, value pairs. Called internally by the [`__eq'](#__eq) metamethod, allowing the use of the `#` operator.
+### Parameters
+| **tbl** | *table \| Collect* | Table or collection to be compared with |
+| :-- | :-- | :-- |
+
+### Code Samples
+```lua
+local collect1 = Collect({
+    a = 1,
+    b = 2,
+})
+local collect2 = Collect({
+    a = 1,
+    b = 2,
+})
+
+print(collect1:equals(collect2)) --> true
+```
+```lua
+local collect = Collect({1, 2, 3})
+
+print(collect:equals({1, 2, 3})) --> true
+```
+
+
+## `every()`
+Returns a boolean indicating if every key, value pair in the collection satisfies a given closure.
+### Parameters
+| **closure** | *function* | Takes two arguments, the `value` and `key` of an entry |
+| :-- | :-- | :-- |
+
+### Code Samples
+```lua
+local collect = Collect({1, 2, 3, 4, 5})
+
+print(collect:every(function(value, key)
+    return value < 10
+end)) --> true
+```
+
+
+## `first()`
+Returns the first element of the collection if it is an array. If the collection is a dictonary, then a random element is returned.
+### Code Samples
+```lua
+local collect = Collect({1, 2, 3})
+
+print(collect:first()) --> 1
+```
+
+## `firstWhere()`
+Returns the first value, key pair that satisfies the given equation. Optionally, can instead pass a single closure that returns the first truthy entry. Returns `nil` if no entry satisfies the condition.
+### Parameters
+|     |     |     |
+| --- | --- | --- |
+| **path** | *string?* | Relative path from each entry to the value to be compared <br> **Default Value:** `"."` |
+| **operator** | *string?* | An operator used for the evaluation. Valid operators are: `=`, `==`, `~=`, `!=`, `<>`, `>=`, `<=`, `<`, `>` <br> **Default Value:** `==` |
+| **compare** | *any* | The fixed value compared against each entry |
+
+Or by a given closure:
+| **closure** | *function* | Takes two arguments, the `value` and `key` of an entry |
+| :-- | :-- | :-- |
+
+### Code Samples
+```lua
+local collect = Collect({4, 8, 15, 16, 23, 42})
+
+local value, key = collect:firstWhere(">", 10)
+print(value) --> 15
+print(key)   --> 3
+```
+```lua
+local collect = Collect({
+    a = 1,
+    b = "two",
+    c = "three",
+    d = 5,
+})
+
+local value, key = collect:firstWhere(function(value, key)
+    return typeof(value) == "string"
+end)
+print(value) --> "three"
+print(key)   --> "c"
+```
+
+
+## `find()`
+Returns the key of the given value in the collection.
+### Parameters
+|     |     |     |
+| :-- | :-- | :-- |
+| **needle** | *any* | The value to search for in the collection |
+| **init** | *number?* | Optional starting index for search. Only applicable for arrays |
+
+### Code Samples
+```lua
+local collect = Collect({4, 8, 15, 16, 23, 42})
+
+print(collect:find(15)) --> 3
+```
+```lua
+local collect = Collect({2, 8, 3, 2, 5})
+
+print(collect:find(2, 3)) --> 4
+```
+
+
+## `isEmpty()`
+Returns boolean indicating if collection is empty.
+```lua
+local collect = Collect()
+print(collect:isEmpty()) --> true
+```
+
+
+## `isNotEmpty()`
+Returns boolean indicating if collection is not empty.
+```lua
+local collect = Collect()
+print(collect:isNotEmpty()) --> false
+```
+
+
+## `last()`
+Returns the last element of the collection if it is an array. If the collection is a dictonary, then a random element is returned.
+```lua
+local collect = Collect({1, 2, 3})
+
+print(collect:last()) --> 3
+```
+
+
+## `max()`
+Returns a (value, max, key) tuple indicating the largest element in the collection.
+### Parameters
+| **path?** | *string* | Relative path from each entry to the value to be compared |
+| :-- | :-- | :-- |
+
+### Code Samples
+```lua
+local collect = Collect({
+    {Value = "A", Weight = 20},
+    {Value = "B", Weight = 99999},
+    {Value = "C", Weight = 2},
+    {Value = "D", Weight = 50},
+    {Value = "E", Weight = 0.0001},
+})
+
+local value, max, key = collect:max("Weight")
+print(value) --> {Value = "B", Weight = 99999}
+print(max)   --> 99999
+print(key)   --> 2
+```
+
+
+## `median()`
+Returns the median of the collection. If the length of the collection is odd, then it returns the average of the two middle values. This method only works for arrays.
+### Parameters
+| **path?** | *string* | Relative path from each entry to the value to be evaluated |
+| :-- | :-- | :-- |
+
+### Code Samples
+
+
 # Updates
 ## `insert()`
 Inserts a value into the collection. The collection's underlying table must be an array.
