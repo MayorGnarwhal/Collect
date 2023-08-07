@@ -1323,6 +1323,4 @@ To read the documentation on the default packages included with collect, [go her
 
 
 # Installation
-Collect can be downloaded on the Roblox store at the following link:
-
-https://www.roblox.com/library/14343691152/Collect
+The Collect module can be downloaded on the [Roblox asset store](https://www.roblox.com/library/14343691152/Collect), or an rbxm file can be downloaded from the [latest release](https://github.com/MayorGnarwhal/Collect/releases).
