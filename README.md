@@ -4,6 +4,7 @@
 * [Metamethods](#metamethods)
 * [Extending Collect](#extending-collect)
     * [Packages](#packages)
+* [Installation](#installation)
 
 
 # Introduction
@@ -1314,5 +1315,12 @@ local collect = Collect({1, 2, 3}):multiplyBy(10)
 print(collect:get()) --> {10, 20, 30}
 ```
 
+
 # Packages
 For easily packagable Collect macros, Collect comes with an optional `macros` module (case-sensitive) that will automatically create the macros on run-time. This will allow you to create your own Collect packages that provide more specialized functionality. This Collect module comes pre-equiped with the `instances` package, that includes various additional methods for handling Instance objects.
+
+
+# Installation
+Collect can be downloaded on the Roblox store at the following link:
+
+https://www.roblox.com/library/14343691152/Collect
