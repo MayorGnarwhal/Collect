@@ -1319,6 +1319,8 @@ print(collect:get()) --> {10, 20, 30}
 # Packages
 For easily packagable Collect macros, Collect comes with an optional `macros` module (case-sensitive) that will automatically create the macros on run-time. This will allow you to create your own Collect packages that provide more specialized functionality. This Collect module comes pre-equiped with the `instances` package, that includes various additional methods for handling Instance objects.
 
+To read the documentation on the default packages included with collect, [go here](https://github.com/MayorGnarwhal/Collect/blob/main/src/lib/macros/README.md).
+
 
 # Installation
 Collect can be downloaded on the Roblox store at the following link:
